@@ -1,0 +1,23 @@
+{% define "home/index.html" %}
+<html>
+<h1>
+    Helo World {% .title %}
+</h1>
+{% if .loginFlag %} Welcome <b>{% .username %}</b>
+<BR> Press <b>F5</b> to refresh browser will clear the flashes since it only show one time.
+<BR> You can try
+<a href="ping">ping</a> | <a href="some-cookie-example">some cookie example</a> | <a href="login">Logout  </a>({% .username %}) {%else%}
+<a href="login">Login</a> {% end %}
+
+<BR> {% .now | formatAsDate %}
+
+<ul>
+    {% range .flashes%}
+    <li>
+        {% . %}
+    </li>
+    {% end %}
+</ul>
+
+</html>
+{% end %}

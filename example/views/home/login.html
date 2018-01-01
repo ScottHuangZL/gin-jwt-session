@@ -1,0 +1,29 @@
+{% define "home/login.html" %}
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Login</title>
+</head>
+
+<body>
+    <h1>JWT login</h1>
+
+    <form action="/validate-jwt-login" method="post">
+        Name: <input type="text" name="username" placeholder="admin">
+        <br> Password: <input type="password" name="password" placeholder="admin">
+        <br> <input type="submit" value="Submit">
+    </form>
+    <BR>You can try login by admin or user1 or user2, the pass same as username.
+
+    <ul>
+        {% range .flashes%}
+        <li>
+            {% . %}
+        </li>
+        {% end %}
+    </ul>
+
+</body>
+{% end%}
