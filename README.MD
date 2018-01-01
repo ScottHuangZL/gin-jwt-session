@@ -1,8 +1,6 @@
 # gin-jwt-session
 
 [![GoDoc](https://godoc.org/github.com/ScottHuangZL/gin-jwt-session?status.png)](http://godoc.org/github.com/ScottHuangZL/gin-jwt-session)
-[![Build Status](https://travis-ci.org/ScottHuangZL/gin-jwt-session.svg?branch=master)](https://travis-ci.org/ScottHuangZL/gin-jwt-session)
-[![Coverage Status](https://coveralls.io/repos/github/ScottHuangZL/gin-jwt-session/badge.svg?branch=master)](https://coveralls.io/github/ScottHuangZL/gin-jwt-session?branch=master)
 [![Go Report](https://goreportcard.com/badge/github.com/ScottHuangZL/gin-jwt-session)](https://goreportcard.com/report/github.com/ScottHuangZL/gin-jwt-session)
 
 ## Description
