@@ -1,11 +1,14 @@
 # gin-jwt-session
 
 [![GoDoc](https://godoc.org/github.com/ScottHuangZL/gin-jwt-session?status.png)](http://godoc.org/github.com/ScottHuangZL/gin-jwt-session)
-
+[![Build Status](https://travis-ci.org/ScottHuangZL/gin-jwt-session.svg?branch=master)](https://travis-ci.org/ScottHuangZL/gin-jwt-session)
+[![Coverage Status](https://coveralls.io/repos/github/ScottHuangZL/gin-jwt-session/badge.svg?branch=master)](https://coveralls.io/github/ScottHuangZL/gin-jwt-session?branch=master)
+[![Go Report](https://goreportcard.com/badge/github.com/ScottHuangZL/gin-jwt-session)](https://goreportcard.com/report/github.com/ScottHuangZL/gin-jwt-session)
 
 ## Description
 
 gin-jwt-session is a Go package that provides JWT and Session for Gin framework
+
 It has the following features:
 
 * Provide JWT tokenstring generate and validate function.
@@ -28,7 +31,7 @@ go get github.com/ScottHuangZL/gin-jwt-session
 
 ## Getting Started
 
-As for example please refer to [gin-jwt-session-example](https://github.com/ScottHuangZL/gin-jwt-session/example). 
+As for example please refer to [gin-jwt-session-example](https://github.com/ScottHuangZL/gin-jwt-session/tree/master/example). 
 
 ```go
 package main
@@ -112,6 +115,102 @@ func setupRouter(r *gin.Engine) {
 	})
 
 }
+```
+
+```go
+package controllers
+
+import (
+	"github.com/ScottHuangZL/gin-jwt-session"
+	"github.com/ScottHuangZL/gin-jwt-session/example/models"
+	"github.com/gin-gonic/gin"
+	// "log"
+	"net/http"
+	"time"
+)
+
+//LoginHandler for login page , it also can use for logout since it delete all stored session
+func LoginHandler(c *gin.Context) {
+	flashes := session.GetFlashes(c)
+	session.DeleteAllSession(c)
+	c.HTML(http.StatusOK, "home/login.html", gin.H{
+		"title":   "Jwt Login",
+		"flashes": flashes,
+	})
+
+}
+
+//HomeHandler is the home handler
+//will show home page, also according login/logout action to navigate
+func HomeHandler(c *gin.Context) {
+	// action := strings.ToLower(c.Param("action"))
+	// path := strings.ToLower(c.Request.URL.Path)
+
+	flashes := session.GetFlashes(c)
+	username, err := session.ValidateJWTToken(c)
+	loginFlag := false
+	if err == nil && username != "" {
+		loginFlag = true
+	}
+	c.HTML(http.StatusOK, "home/index.html", gin.H{
+		"title":     "Main website",
+		"now":       time.Now(),
+		"flashes":   flashes,
+		"loginFlag": loginFlag,
+		"username":  username,
+	})
+}
+
+//ValidateJwtLoginHandler validate the login and redirect to correct link
+func ValidateJwtLoginHandler(c *gin.Context) {
+	var form model.Login
+	//try get login info
+	if err := c.ShouldBind(&form); err != nil {
+		session.SetFlash(c, "Get login info error: "+err.Error())
+		c.Redirect(http.StatusMovedPermanently, "/login")
+		return
+	}
+	//validate login info
+	if ok := model.ValidateUser(form.Username, form.Password); !ok {
+		session.SetFlash(c, "Error : username or password")
+		c.Redirect(http.StatusMovedPermanently, "/login")
+		return
+	}
+	//login info is correct, can generate JWT token and store in clien side now
+	tokenString, err := session.GenerateJWTToken(form.Username, time.Hour*time.Duration(1))
+	if err != nil {
+		session.SetFlash(c, "Error Generate token string: "+err.Error())
+		c.Redirect(http.StatusMovedPermanently, "/login")
+		return
+	}
+
+	err = session.SetTokenString(c, tokenString, 60*60) //60 minutes
+	if err != nil {
+		session.SetFlash(c, "Error set token string: "+err.Error())
+		c.Redirect(http.StatusMovedPermanently, "/login")
+		return
+	}
+	session.SetFlash(c, "success : successful login")
+	session.SetFlash(c, "username : "+form.Username)
+	c.Redirect(http.StatusMovedPermanently, "/")
+	return
+}
+
+//SomeCookiesHandler show cookie example
+func SomeCookiesHandler(c *gin.Context) {
+	session.Set(c, "hello", "world")
+	sessionMessage, _ := session.GetString(c, "hello")
+	session.Set(c, "hello", 2017)
+	message2, _ := session.GetInt(c, "hello")
+	session.Delete(c, "hello")
+	readAgain, _ := session.GetString(c, "hello")
+	c.JSON(http.StatusOK, gin.H{
+		"session message":                 sessionMessage,
+		"session new message":             message2,
+		"session read again after delete": readAgain,
+		"status": http.StatusOK})
+}
+
 ```
 
 ## Credits
