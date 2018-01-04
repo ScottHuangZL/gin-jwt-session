@@ -7,6 +7,9 @@
 
 gin-jwt-session is a Go package that provides JWT and Session for Gin framework
 
+It already been adopt as one of gin [gin-contrib](https://github.com/gin-gonic/contrib) formal middleware
+
+
 It has the following features:
 
 * Provide JWT tokenstring generate and validate function.
